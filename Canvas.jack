@@ -1,0 +1,60 @@
+class Canvas{
+	
+	field int xStartPlayer;
+	field int xEndPlayer;
+	field int xStartAI;
+	field int xEndAI;
+	field int yStart;
+	field int yEnd;
+	field int offSet;
+
+
+	constructor Canvas new(){
+		// class variable init
+		let xStartPlayer = 28;
+		let xEndPlayer = 228;
+		let xStartAI = 284;
+		let xEndAI = 484;
+		let yStart = 28;
+		let yEnd = 228;
+		let offSet = 20;
+
+		do drawCells(xStartPlayer, xEndPlayer);
+		do drawCells(xStartAI, xEndAI);
+
+		return this;
+	}
+
+	method void drawCells(int xStart, int xEnd){
+		var int i;
+		var int j;
+		var int k;
+		var int x;
+		var int y;
+
+		let i = 0;
+
+		while(i < 11){
+			let k = 0;
+			let x = xStart;
+			let y = yStart + (i * offSet);
+			while(x < xEnd){
+				do Screen.drawPixel(x, y);
+				if (((k = offSet) | (x = xStart) | (x = (xEnd - 1))) & ~(i = 10)){
+					let j = 1;
+					while(j < 19){
+						do Screen.drawPixel(x, y + j);
+						let j = j + 1;
+					}
+					let k = 0;
+				}
+				let k = k + 1;
+				let x = x + 1;
+			}
+			let i = i + 1;
+		}
+
+		return;
+	}
+
+}

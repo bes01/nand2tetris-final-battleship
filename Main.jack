@@ -1,0 +1,19 @@
+class Main {
+
+	function void main() {
+		// var declaration
+		var Canvas canvas;
+		
+		// var init
+		let canvas = Canvas.new();
+		
+		// Loop the process
+		// while(true){
+			
+		// }
+		
+		// Dispose everything
+        return;
+    }
+	
+}
