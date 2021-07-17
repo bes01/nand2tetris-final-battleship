@@ -1,0 +1,89 @@
+class PlayerShips{
+	
+	field Int xStart, xEnd, yStart, yEnd, dimension;
+	field Array grid; // i - x, j - y
+
+	constructor PlayerShips new(Int x1, Int y1, Int x2, Int y2, Int shipDimension){
+		let xStart = x1;
+		let xEnd = x2;
+		let yStart = y1;
+		let yEnd = y2;
+		let dimension = shipDimension;
+		let grid = Array.new(dimension);
+
+		do resetBoard(true);
+
+		return this;
+	}
+
+	method void toggleShipPart(Int i, Int j){
+		var Boolean black;
+		var Array tempArray;
+		let tempArray = grid[i];
+
+		let black = true;
+		if (~(tempArray[j] = 0)){
+			let black = false;
+		} 
+
+		if(black){
+			let tempArray[j] = 1;
+			do Screen.setColor(true);
+		}
+		if(~black){
+			let tempArray[j] = 0;
+			do Screen.setColor(false);			
+		}
+
+		let i = xStart + (i * dimension);
+		let j = yStart + (j * dimension);
+
+		do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
+
+		return;
+	}
+
+	method Boolean isShipPart(Int i, Int j){
+		var Array tempArray;
+		let tempArray = grid[i];
+		return tempArray[j];
+	}
+
+	method Boolean validateBoard(){
+		// TODO: HIGH PRIORITY
+		return false;
+	}
+
+	method void resetBoard(Boolean firstTime){
+		var Int i, j;
+		var Array tempArray;
+
+		let i = 0;
+		while(i < dimension){
+			let j = 0;
+			if(firstTime){
+				let tempArray = Array.new(dimension);
+				let grid[i] = tempArray;
+			}
+			if(~firstTime){
+				let tempArray = grid[i];				
+			}
+			while(j < dimension){
+				if(tempArray[j]){
+					do toggleShipPart(i, j);
+				}
+				let tempArray[j] = 0;
+				let j = j + 1;
+			}
+			let i = i + 1;
+		}
+
+		return;
+	}
+
+	method void Dispose(){
+		// TODO
+		return;
+	}
+
+}

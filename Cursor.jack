@@ -1,0 +1,126 @@
+class Cursor{
+
+	field int currX, currY, dimension, xStart, xEnd, yStart, yEnd, i, j;
+
+
+	constructor Cursor new(Int x, Int y, Int dim, Int xStartBoundary, Int xEndBoundary, Int yStartBoundary, Int yEndBoundary){
+		let currX = x;
+		let currY = y;
+		let dimension = dim;
+		let xStart = xStartBoundary;
+		let xEnd = xEndBoundary;
+		let yStart = yStartBoundary;
+		let yEnd = yEndBoundary; 
+		let i = 0;
+		let j = 0;
+
+		do setCursor(x, y, true);
+
+		return this;
+	}
+
+	method void setCursor(Int x, Int y, Boolean color){
+		do Screen.setColor(color);
+
+		do Screen.drawLine(x + 1, y + 1, x + 1, y + dimension - 1);
+		do Screen.drawLine(x + 2, y + 1, x + dimension - 2, y + 1);
+		do Screen.drawLine(x + dimension - 1, y + 1, x + dimension - 1, y + dimension - 1);
+		do Screen.drawLine(x + 2, y + dimension - 1, x + dimension - 2, y + dimension - 1);
+
+		return;
+	}
+
+	method void moveLeft(){
+		var Int x, y;
+
+		let x = currX - dimension;
+		let y = currY;
+
+		if(x < xStart){
+			return;
+		}
+
+		do setCursor(currX, currY, false);
+		do setCursor(x, y, true);
+
+		let currX = x;
+		let currY = y;
+		let i = i - 1;
+
+		return;
+	}
+
+	method void moveRight(){
+		var Int x, y;
+
+		let x = currX + dimension;
+		let y = currY;
+
+		if((x > xEnd) | (x = xEnd)){
+			return;
+		}
+		
+		do setCursor(currX, currY, false);
+		do setCursor(x, y, true);
+
+		let currX = x;
+		let currY = y;
+		let i = i + 1;
+
+		return;
+	}
+
+	method void moveUp(){
+		var Int x, y;
+
+		let x = currX;
+		let y = currY - dimension;
+
+		if(y < yStart){
+			return;
+		}
+		
+		do setCursor(currX, currY, false);
+		do setCursor(x, y, true);
+
+		let currX = x;
+		let currY = y;
+		let j = j - 1;
+
+		return;
+	}
+
+	method void moveDown(){
+		var Int x, y;
+
+		let x = currX;
+		let y = currY + dimension;
+
+		if((y > yEnd) | (y = yEnd)){
+			return;
+		}
+
+		do setCursor(currX, currY, false);
+		do setCursor(x, y, true);
+
+		let currX = x;
+		let currY = y;
+		let j = j + 1;
+
+		return;
+	}
+
+	method Int getX(){
+		return i;
+	}
+
+	method Int getY(){
+		return j;
+	}
+
+	method void Dispose(){
+		// TODO
+		return;
+	}
+
+}

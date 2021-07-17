@@ -6,7 +6,9 @@ class Canvas{
 	field int xEndAI;
 	field int yStart;
 	field int yEnd;
-	field int offSet;
+	field int dimension;
+
+	field Cursor cursor;
 
 
 	constructor Canvas new(){
@@ -17,10 +19,16 @@ class Canvas{
 		let xEndAI = 484;
 		let yStart = 28;
 		let yEnd = 228;
-		let offSet = 20;
+		let dimension = 20;
 
+		// draw boards
 		do drawCells(xStartPlayer, xEndPlayer);
 		do drawCells(xStartAI, xEndAI);
+
+		// init cursor
+		let cursor = Cursor.new(xStartPlayer, yStart, dimension, xStartPlayer, xEndPlayer, yStart, yEnd);
+
+		do initPlayerBoard();
 
 		return this;
 	}
@@ -37,12 +45,12 @@ class Canvas{
 		while(i < 11){
 			let k = 0;
 			let x = xStart;
-			let y = yStart + (i * offSet);
-			while(x < xEnd){
+			let y = yStart + (i * dimension);
+			while(x < (xEnd + 1)){
 				do Screen.drawPixel(x, y);
-				if (((k = offSet) | (x = xStart) | (x = (xEnd - 1))) & ~(i = 10)){
+				if (((k = dimension) | (x = xStart) | (x = xEnd)) & ~(i = 10)){
 					let j = 1;
-					while(j < 19){
+					while(j < 20){
 						do Screen.drawPixel(x, y + j);
 						let j = j + 1;
 					}
@@ -55,6 +63,43 @@ class Canvas{
 		}
 
 		return;
+	}
+
+	method void initPlayerBoard(){
+		var char key;  
+		var boolean exit;
+		var PlayerShips playerGrid;
+		
+		let exit = false;
+      	let playerGrid = PlayerShips.new(xStartPlayer, yStart, xEndPlayer, yEnd, dimension);
+
+		while (~exit) {
+			// waits for a key to be pressed
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+			}
+
+			if (key = 131) { do cursor.moveUp(); }   // up arrow
+			if (key = 133) { do cursor.moveDown(); }   // down arrow
+			if (key = 130) { do cursor.moveLeft(); }   // left arrow
+			if (key = 132) { do cursor.moveRight(); }   // right arrow
+			if (key = 128) { do playerGrid.toggleShipPart(cursor.getX(), cursor.getY()); }  // enter, p.s: ჯეკში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
+			if (key = 83) { 
+				if (playerGrid.validateBoard()){
+					let exit = true;
+				}
+				if (~playerGrid.validateBoard()){
+					do playerGrid.resetBoard(false);
+				}
+			}  // s 
+
+			// waits for the key to be released
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+			}
+		} 
+
+     	return;
 	}
 
 }
