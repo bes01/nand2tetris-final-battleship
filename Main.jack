@@ -7,10 +7,7 @@ class Main {
 		// var init
 		let canvas = Canvas.new();
 		
-		//
-		
-		// Dispose everything
-		// do canvas.Dispose();
+		// Dispose 
         return;
     }
 	

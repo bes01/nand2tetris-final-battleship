@@ -1,13 +1,11 @@
 class PlayerShips{
 	
-	field Int xStart, xEnd, yStart, yEnd, dimension;
+	field Int xStart, yStart, dimension;
 	field Array grid; // i - x, j - y
 
-	constructor PlayerShips new(Int x1, Int y1, Int x2, Int y2, Int shipDimension){
-		let xStart = x1;
-		let xEnd = x2;
-		let yStart = y1;
-		let yEnd = y2;
+	constructor PlayerShips new(Int x, Int y, Int shipDimension){
+		let xStart = x;
+		let yStart = y;
 		let dimension = shipDimension;
 		let grid = Array.new(dimension);
 
@@ -96,7 +94,7 @@ class PlayerShips{
 
 
 		if(five | four | three | two | one){
-			return false;
+			return true; // TODO: change to false
 		}
 
 		return true;

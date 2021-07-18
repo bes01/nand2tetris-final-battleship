@@ -9,6 +9,8 @@ class Canvas{
 	field int dimension;
 
 	field Cursor cursor;
+	field PlayerShips playerGrid;
+	field AIShips aiGrid;
 
 
 	constructor Canvas new(){
@@ -28,7 +30,9 @@ class Canvas{
 		// init cursor
 		let cursor = Cursor.new(xStartPlayer, yStart, dimension, xStartPlayer, xEndPlayer, yStart, yEnd);
 
-		do initPlayerBoard();
+		// init boards
+		let playerGrid = PlayerShips.new(xStartPlayer, yStart, dimension);
+		do initBoards();
 
 		return this;
 	}
@@ -65,18 +69,20 @@ class Canvas{
 		return;
 	}
 
-	method void initPlayerBoard(){
+	method void initBoards(){
 		var char key;  
 		var boolean exit;
-		var PlayerShips playerGrid;
-		
-		let exit = false;
-      	let playerGrid = PlayerShips.new(xStartPlayer, yStart, xEndPlayer, yEnd, dimension);
+		var RandomUtil random;
+		var Int seed; // don't init for more randomness
 
+		let exit = false;
+
+		// Player board init
 		while (~exit) {
 			// waits for a key to be pressed
 			while (key = 0) {
 				let key = Keyboard.keyPressed();
+				let seed = seed + 1;
 			}
 
 			if (key = 131) { do cursor.moveUp(); }   // up arrow
@@ -84,21 +90,23 @@ class Canvas{
 			if (key = 130) { do cursor.moveLeft(); }   // left arrow
 			if (key = 132) { do cursor.moveRight(); }   // right arrow
 			if (key = 128) { do playerGrid.toggleShipPart(cursor.getX(), cursor.getY()); }  // enter, p.s: სლაიდებში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
-			if (key = 83) { 
+			if (key = 83) { // s 
 				if (playerGrid.validateBoard()){
-					do Output.printString("Correct");
 					let exit = true;
 				}
 				if (~playerGrid.validateBoard()){
 					do playerGrid.resetBoard(false);
 				}
-			}  // s 
+			}  
 
 			// waits for the key to be released
 			while (~(key = 0)) {
 				let key = Keyboard.keyPressed();
 			}
-		} 
+		}
+
+		// AI board init
+		let aiGrid = AIShips.new(RandomUtil.new(seed), xStartAI, yStart, dimension);
 
      	return;
 	}

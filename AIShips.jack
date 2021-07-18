@@ -1,0 +1,204 @@
+class AIShips{
+	
+	field RandomUtil random;
+	field Int xStart, yStart, dimension;
+	field Array grid; // i - x, j - y
+
+
+	constructor AIShips new(RandomUtil randomInstance, Int x, Int y, Int shipDimension){
+		let random = randomInstance;
+		let xStart = x;
+		let yStart = y;
+		let dimension = shipDimension;
+		let grid = Array.new(dimension);
+
+		do resetBoard(true);
+
+		return this;
+	}
+
+	// modes: 0 - clear, 1 - X, 2 - !, 3 - #, 4 - mark matrix
+	method void toggleShipPart(Int i, Int j, Int mode){
+		var Boolean black;
+		var Array tempArray;
+
+		let tempArray = grid[i];
+
+		if(mode = 0){ // clear
+			let tempArray[j] = 0;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+			do Screen.setColor(false);
+			do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
+		}
+
+		if(mode = 1){ // X - sank
+
+		}
+
+		if(mode = 2){ // ! - partially sank
+			
+		}
+
+		if(mode = 3){ // # - missed shots
+
+		}
+
+		if(mode = 4){ // mark matrix      TODO: remove coloring
+			let tempArray[j] = 1;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+			do Screen.setColor(true);
+			do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
+		}
+
+		return;
+	}
+
+	// find place randomly for ship      TODO: sometimes throws error
+	method void placeShipSomewhere(Int shipLength){
+		var Int start, end;
+		var Int i, j;
+		var Boolean direction; // false - vertical, true - horizontal
+		var Array tempArray;
+		var Boolean endLoop;
+		var Int k;
+
+		while(true){ // keep while until success
+			let i = random.nextInt(10);
+			let j = random.nextInt(10);
+
+			if(validateCoordinate(i, j)){
+				if(shipLength = 1){
+					do toggleShipPart(i, j, 4);
+					return;
+				}
+
+				let tempArray = grid[i];
+				let direction = random.nextInt(2);
+				if(~direction){ // first we try to go up, then down
+					let end = j;
+					let endLoop = false;
+					while((j > -1) & ~endLoop){ // find space up
+						if(~validateCoordinate(i, j)){
+							let endLoop = true;
+							let start = j + 1;
+						}
+						let j = j - 1;
+					}
+					let j = end; // restore j;
+					let endLoop = false;
+					while((j < (dimension - 1)) & ~endLoop){
+						if(~validateCoordinate(i, j)){
+							let endLoop = true;
+							let end = j - 1;
+						}
+						let j = j + 1;
+					}
+					if(((end - start) > shipLength) | ((end - start) = shipLength)){
+						let k = 0;
+						while(k < shipLength){
+							do toggleShipPart(i, start + k, 4);
+							let k = k + 1;
+						}
+						return;
+					}									
+				}
+				if(direction){ // first we try to go left, then right
+					let end = i;
+					let endLoop = false;
+					while((i > -1) & ~endLoop){ // find left up
+						if(~validateCoordinate(i, j)){
+							let endLoop = true;
+							let start = i + 1;
+						}
+						let i = i - 1;
+					}
+					let i = end; // restore i;
+					let endLoop = false;
+					while((i < (dimension - 1)) & ~endLoop){
+						if(~validateCoordinate(i, j)){
+							let endLoop = true;
+							let end = i - 1;
+						}
+						let i = i + 1;
+					}
+					if((((end - start) + 1) > shipLength) | (((end - start) + 1) = shipLength)){
+						let k = 0;
+						while(k < shipLength){
+							do toggleShipPart(start + k, j, 4);
+							let k = k + 1;
+						}
+						return;
+					}
+				}
+			}
+		}
+
+		return;
+	}
+
+	// validates that no adjacent ship present
+	method Boolean validateCoordinate(Int i, Int j){
+		var Int x, y;
+		var Array tempArray;
+
+		let x = -1;
+		while(x < 2){
+			let y = -1;
+			while(y < 2){
+				if(validateBoundaries(i + (x), j + (y))){
+					let tempArray = grid[i + (x)];
+					if(tempArray[j + (y)]){
+						return false;
+					}
+				}
+				let y = y + 1;
+			}
+			let x = x + 1;
+		}
+
+		return true;
+	}
+
+	method boolean validateBoundaries(Int i, Int j){
+		return (i > -1) & (i < 10) & (j > -1) & (j < 10); 
+	}
+
+	method void resetBoard(Boolean firstTime){
+		var Int i, j;
+		var Array tempArray;
+
+		let i = 0;
+		while(i < 10){
+			let j = 0;
+			if(firstTime){
+				let tempArray = Array.new(10);
+				let grid[i] = tempArray;
+			}
+			if(~firstTime){
+				let tempArray = grid[i];				
+			}
+			while(j < 10){
+				if(tempArray[j]){
+					do toggleShipPart(i, j, 0);
+				}
+				let tempArray[j] = 0;
+				let j = j + 1;
+			}
+			let i = i + 1;
+		}
+
+		// randomize ship locations
+		do placeShipSomewhere(5);
+		do placeShipSomewhere(4);
+		do placeShipSomewhere(3);
+		do placeShipSomewhere(2);
+		do placeShipSomewhere(2);
+		do placeShipSomewhere(1);
+		do placeShipSomewhere(1);
+
+		return;
+	}
+
+}

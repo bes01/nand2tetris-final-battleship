@@ -1,0 +1,43 @@
+class RandomUtil{ // TODO: upgrade, need more random
+	
+	field Int multiplier, increment, seed;
+
+	constructor RandomUtil new(Int randomSeed){
+		let multiplier = 75;
+		let increment = 74;
+		let seed = randomSeed;
+		return this;
+	}
+
+	// returns [0, modulus)
+	method Int nextInt(Int modulus){
+		var Int result;
+
+		let seed = (seed * multiplier) + increment;
+		let result = seed;
+
+		if(result < 0){
+			let result = -result;
+		}
+		
+		while((result > 0) ){
+			let result = result - modulus;
+		}
+		if(result < 0){
+			let result = -result;
+		}
+
+		return result;
+	}
+
+	method Boolean nextBoolean(){
+		var Int result;
+		let result = nextInt(100);
+		if(result> 50){
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+}
