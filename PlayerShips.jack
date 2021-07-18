@@ -49,10 +49,200 @@ class PlayerShips{
 		return tempArray[j];
 	}
 
+//************************VALIDATION******************************
+
 	method Boolean validateBoard(){
-		// TODO: HIGH PRIORITY
-		return false;
+		var Array tempArray;
+		var Int i, j;
+		var Int five, four, three, two, one;
+		var Int currShipLength;
+		
+		let five = 1;
+		let four = 1;
+		let three = 1;
+		let two = 2;
+		let one = 2;
+
+		let i = 0;
+		while(i < dimension){
+			let tempArray = grid[i];
+			let j = 0;
+			while(j < dimension){
+				if(tempArray[j] = 1){
+					let currShipLength = markShip(i, j);
+					if((currShipLength = 0) | (currShipLength > 5)){
+						return false;
+					}
+					if(currShipLength = 5){
+						let five = five - 1;
+					}
+					if(currShipLength = 4){
+						let four = four - 1;
+					}
+					if(currShipLength = three){
+						let three = three - 1;
+					}
+					if(currShipLength = two){
+						let two = two - 1;
+					}
+					if(currShipLength = 1){
+						let one = one - 1;
+					}
+				}
+				let j = j + 1;
+			}
+			let i = i + 1;
+		}
+
+
+		if(five | four | three | two | one){
+			return false;
+		}
+
+		return true;
 	}
+
+	// mark validated ships as 2
+	method Int markShip(int i, int j){
+		var Boolean endMark;
+		var Array tempArray;
+		var Int shipLength;
+		var Int direction; // 1 - up, 2 - down, 3 - left, 4 - right
+		let direction = 0;
+		let shipLength = 0;
+		let endMark = false;
+
+		// find direction
+		if((~(i = 0))){ // check left
+			let tempArray = grid[i - 1];
+			if (tempArray[j] = 1){
+				let direction = 3; // save direction
+			}
+		}
+		if((~(i = (dimension - 1))) & (direction = 0)){ //check right if direction wasnt found already
+			let tempArray = grid[i + 1];
+			if (tempArray[j] = 1){
+				let direction = 4; // save direction
+			}
+		}
+		if((~(j = 0)) & (direction = 0)){ //check up if direction wasnt found already
+			let tempArray = grid[i];
+			if (tempArray[j - 1] = 1){
+				let direction = 1; // save direction
+			}
+		}
+		if((~(j = (dimension - 1))) & (direction = 0)){
+			let tempArray = grid[i];
+			if (tempArray[j + 1] = 1){
+				let direction = 2;
+			}
+		}
+
+		// mark one length ship
+		if(direction = 0){
+			let tempArray = grid[i];
+			let tempArray[j] = 2;
+			return 1;
+		}
+
+		// mark horizontal ship
+		if((direction = 3) | (direction = 4)){ 
+			let direction = i; // temp variable
+			while((~(i = -1)) & ~endMark){
+				let tempArray = grid[i];
+				if(tempArray[j] = 0){
+					let endMark = true;
+				}
+				if(~endMark){
+					let tempArray[j] = 2; // mark
+					if(((~(j = 0)) & (tempArray[j - 1])) | ((~(j = (dimension - 1))) & tempArray[j + 1])){ // invalid configuration, adjacent ship found
+						return 0;
+					}
+					let i = i - 1;
+					let shipLength = shipLength + 1;
+				}
+			}
+			let endMark = false;
+			let i = direction + 1; // restore i and add 1
+			while((~(i = dimension)) & ~endMark){
+				let tempArray = grid[i];
+				if(tempArray[j] = 0){
+					let endMark = true;
+				}
+				if(~endMark){
+					let tempArray[j] = 2; // mark
+					if(((~(j = 0)) & (tempArray[j - 1])) | ((~(j = (dimension - 1))) & tempArray[j + 1])){ // invalid configuration, adjacent ship found
+						return 0;
+					}
+					let i = i + 1;
+					let shipLength = shipLength + 1;
+				}
+			}
+			return shipLength;
+		}
+
+		// mark vertical ship
+		if((direction = 1) | (direction = 2)){ 
+			let direction = j; //temp variable
+			while((~(j = -1)) & ~endMark){
+				let tempArray = grid[i];
+				if(tempArray[j] = 0){
+					let endMark = true;
+				}
+				if(~endMark){
+					let tempArray[j] = 2;
+					
+					if(~(i = 0)){ 
+						let tempArray = grid[i-1];
+						if(tempArray[j]){ // invalid configuration, adjacent ship found
+							return 0;
+						}
+					}
+					if(~(i = (dimension - 1))){ 
+						let tempArray = grid[i+1];
+						if(tempArray[j]){ // invalid configuration, adjacent ship found
+							return 0;
+						}
+					}
+
+					let j = j - 1;
+					let shipLength = shipLength + 1;
+				}
+			}
+			let endMark = false;
+			let j = direction + 1;
+			while((~(j = dimension)) & ~endMark){
+				let tempArray = grid[i];
+				if(tempArray[j] = 0){
+					let endMark = true;
+				}
+				if(~endMark){
+					let tempArray[j] = 2;
+				
+					if(~(i = 0)){ 
+						let tempArray = grid[i-1];
+						if (tempArray[j]) { // invalid configuration, adjacent ship found
+							return 0;
+						}
+					}
+					if (~(i = (dimension - 1))) { 
+						let tempArray = grid[i+1];
+						if (tempArray[j]) { // invalid configuration, adjacent ship found
+							return 0;
+						}
+					}
+
+					let j = j + 1;
+					let shipLength = shipLength + 1;
+				}
+			}
+			return shipLength;
+		}
+
+		return 0;
+	}
+
+//******************************************************
 
 	method void resetBoard(Boolean firstTime){
 		var Int i, j;

@@ -83,9 +83,10 @@ class Canvas{
 			if (key = 133) { do cursor.moveDown(); }   // down arrow
 			if (key = 130) { do cursor.moveLeft(); }   // left arrow
 			if (key = 132) { do cursor.moveRight(); }   // right arrow
-			if (key = 128) { do playerGrid.toggleShipPart(cursor.getX(), cursor.getY()); }  // enter, p.s: ჯეკში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
+			if (key = 128) { do playerGrid.toggleShipPart(cursor.getX(), cursor.getY()); }  // enter, p.s: სლაიდებში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
 			if (key = 83) { 
 				if (playerGrid.validateBoard()){
+					do Output.printString("Correct");
 					let exit = true;
 				}
 				if (~playerGrid.validateBoard()){
