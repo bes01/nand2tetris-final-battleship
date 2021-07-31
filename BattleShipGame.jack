@@ -1,0 +1,120 @@
+class BattleShipGame{
+	
+	field int xStartPlayer;
+	field int xEndPlayer;
+	field int xStartAI;
+	field int xEndAI;
+	field int yStart;
+	field int yEnd;
+	field int dimension;
+
+	field Cursor cursor;
+	field PlayerShips playerGrid;
+	field AIShips aiGrid;
+
+
+	constructor BattleShipGame new(){
+		// class variable init
+		let xStartPlayer = 28;
+		let xEndPlayer = 228;
+		let xStartAI = 284;
+		let xEndAI = 484;
+		let yStart = 28;
+		let yEnd = 228;
+		let dimension = 20;
+
+		// draw boards
+		do drawCells(xStartPlayer, xEndPlayer);
+		do drawCells(xStartAI, xEndAI);
+
+		// init cursor
+		let cursor = Cursor.new(xStartPlayer, yStart, dimension, xStartPlayer, xEndPlayer, yStart, yEnd);
+
+		// init boards
+		let playerGrid = PlayerShips.new(xStartPlayer, yStart, dimension);
+		do initBoards();
+
+		return this;
+	}
+
+	method void drawCells(int xStart, int xEnd){
+		var int i;
+		var int j;
+		var int k;
+		var int x;
+		var int y;
+
+		let i = 0;
+
+		while(i < 11){
+			let k = 0;
+			let x = xStart;
+			let y = yStart + (i * dimension);
+			while(x < (xEnd + 1)){
+				do Screen.drawPixel(x, y);
+				if (((k = dimension) | (x = xStart) | (x = xEnd)) & ~(i = 10)){
+					let j = 1;
+					while(j < 20){
+						do Screen.drawPixel(x, y + j);
+						let j = j + 1;
+					}
+					let k = 0;
+				}
+				let k = k + 1;
+				let x = x + 1;
+			}
+			let i = i + 1;
+		}
+
+		return;
+	}
+
+	method void initBoards(){
+		var char key;  
+		var boolean exit;
+		var RandomUtil random;
+		var Int seed; // don't init for more randomness
+
+		let exit = false;
+
+		// Player board init
+		while (~exit) {
+			// waits for a key to be pressed
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+				let seed = seed + 1;
+			}
+
+			if (key = 131) { do cursor.moveUp(); }   // up arrow
+			if (key = 133) { do cursor.moveDown(); }   // down arrow
+			if (key = 130) { do cursor.moveLeft(); }   // left arrow
+			if (key = 132) { do cursor.moveRight(); }   // right arrow
+			if (key = 128) { do playerGrid.toggleShipPart(cursor.getX(), cursor.getY()); }  // enter, p.s: სლაიდებში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
+			if (key = 83) { // s key
+				if (playerGrid.validateBoard()){
+					let exit = true;
+					do cursor.Dispose();
+				}
+				if (~exit){
+					do playerGrid.resetBoard(false);
+				}
+			}  
+
+			// waits for the key to be released
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+			}
+		}
+
+		// AI board init
+		let aiGrid = AIShips.new(RandomUtil.new(seed), xStartAI, yStart, dimension);
+
+     	return;
+	}
+
+	method void run(){
+		
+		return;
+	}
+
+}
