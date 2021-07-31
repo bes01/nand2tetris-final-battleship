@@ -17,10 +17,105 @@ class AIShips{
 		return this;
 	}
 
+	method void receiveOpponentShot(int i, int j){
+		var Array tempArray;
+		var Int cellType;
+
+		let tempArray = grid[i];
+		let cellType = tempArray[j]; 
+
+		if(cellType = 0){
+			do toggleShipPart(i, j, 3);
+		}
+		if(cellType = 1){
+			do toggleShipPart(i, j, 2);
+		}
+		
+		do checkIfSank(i, j);
+		
+		return;
+	}
+
+	// TODO: implement vertical and horizontal check
+	method void checkIfSank(int i, int j){
+		var Int start, end, direction;
+		var Boolean isSank;
+
+		let direction = checkShipDirection(i, j);
+		do Output.printInt(direction);
+		// horizontal
+		if(direction = 1){
+
+		}
+		
+		// vertical
+		if(direction = 2){
+			
+		}
+
+		// point
+		if(direction = 3){
+			do Sys.wait(500);
+			do toggleShipPart(i, j, 1);
+		}
+
+		return;
+	}
+
+	// 0 - empty cell, 1 - horizontal, 2 - vertical, 3 - point
+	method Int checkShipDirection(int i, int j){
+		var Int x, y;
+		var Array tempArray;
+		var boolean isPoint;
+
+		let isPoint = false;
+		let tempArray = grid[i];
+		if(tempArray[j] = 2){
+			let isPoint = true;
+		}
+
+		// check horizontal
+		if(isPoint & validateBoundaries(i + 1, j)){
+			let tempArray = grid[i + 1];
+			if((tempArray[j] = 2) | (tempArray[j] = 1)){
+				return 1;
+			}
+		}
+		if(isPoint & validateBoundaries(i - 1, j)){
+			let tempArray = grid[i - 1];
+			if((tempArray[j] = 2) | (tempArray[j] = 1)){
+				return 1;
+			}
+		}
+
+		// check vertical
+		if(isPoint & validateBoundaries(i, j - 1)){
+			let tempArray = grid[i];
+			if((tempArray[j - 1] = 2) | (tempArray[j - 1] = 1)){
+				return 2;
+			}
+		}
+		if(isPoint & validateBoundaries(i, j + 1)){
+			let tempArray = grid[i];
+			if((tempArray[j + 1] = 2) | (tempArray[j + 1] = 1)){
+				return 2;
+			}
+		}
+		
+		// isPoint
+		if(isPoint){
+			return 3;
+		}
+
+		// it's point
+		return 0;
+	}
+
 	// modes: 0 - clear, 1 - X, 2 - !, 3 - #, 4 - mark matrix
 	method void toggleShipPart(Int i, Int j, Int mode){
 		var Boolean black;
 		var Array tempArray;
+		var Int tempInt;
 
 		let tempArray = grid[i];
 
@@ -33,18 +128,46 @@ class AIShips{
 		}
 
 		if(mode = 1){ // X - sank
+			do toggleShipPart(i, j, 0);  // TODO: remove afterwards
+			let tempArray[j] = -1;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
 
+			// drawing !
+			do Screen.setColor(true);
+			do Screen.drawLine(i + 2, j + 3, i + dimension - 2, j + dimension - 2);
+			do Screen.drawLine(i + 2, j + 2, i + dimension - 3, j + dimension - 2);
+			do Screen.drawLine(i + 2, j + dimension - 3, i + dimension - 3, j + 2);
+			do Screen.drawLine(i + 2, j + dimension - 2, i + dimension - 2, j + 2);
+			// do Screen.drawRectangle(i + 9, j + 15, i + 10, j + 17);
 		}
 
 		if(mode = 2){ // ! - partially sank
-			
+			do toggleShipPart(i, j, 0);  // TODO: remove afterwards
+			let tempArray[j] = 2;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+
+			// drawing !
+			do Screen.setColor(true);
+			do Screen.drawRectangle(i + 9, j + 2, i + 10, j + 13);
+			do Screen.drawRectangle(i + 9, j + 15, i + 10, j + 17);
 		}
 
 		if(mode = 3){ // # - missed shots
+			let tempArray[j] = 3;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+			let tempInt = ((dimension / 3) + 1);
 
+			// drawing #
+			do Screen.drawLine(i + 1, j + tempInt, i + 18, j + tempInt);
+			do Screen.drawLine(i + 1, j + (2 * tempInt), i + 18, j + (2 * tempInt));
+			do Screen.drawLine(i + tempInt, j + 1, i + tempInt, j + 18);
+			do Screen.drawLine(i + (2 * tempInt), j + 1, i + (2 * tempInt), j + 18);
 		}
 
-		if(mode = 4){ // mark matrix
+		if(mode = 4){ // mark matrix / put ship
 			let tempArray[j] = 1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
@@ -55,7 +178,7 @@ class AIShips{
 		return;
 	}
 
-	// find place randomly for ship      TODO: sometimes throws error
+	// find place randomly for ship
 	method void placeShipSomewhere(Int shipLength){
 		var Int start, end;
 		var Int i;
