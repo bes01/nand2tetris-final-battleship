@@ -44,11 +44,11 @@ class AIShips{
 
 		}
 
-		if(mode = 4){ // mark matrix      TODO: remove coloring
+		if(mode = 4){ // mark matrix
 			let tempArray[j] = 1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
-			do Screen.setColor(true);
+			do Screen.setColor(true); //TODO: remove coloring
 			do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
 		}
 
@@ -58,12 +58,13 @@ class AIShips{
 	// find place randomly for ship      TODO: sometimes throws error
 	method void placeShipSomewhere(Int shipLength){
 		var Int start, end;
-		var Int i, j;
+		var Int i;
+		var Int j;
 		var Boolean direction; // false - vertical, true - horizontal
-		var Array tempArray;
 		var Boolean endLoop;
 		var Int k;
 
+		
 		while(true){ // keep while until success
 			let i = random.nextInt(10);
 			let j = random.nextInt(10);
@@ -74,9 +75,8 @@ class AIShips{
 					return;
 				}
 
-				let tempArray = grid[i];
-				let direction = random.nextInt(2);
-				if(~direction){ // first we try to go up, then down
+				let direction = random.nextBoolean(); // TODO: make better random
+				if(direction = 0){ // first we try to go up, then down
 					let end = j;
 					let endLoop = false;
 					while((j > -1) & ~endLoop){ // find space up
@@ -95,7 +95,8 @@ class AIShips{
 						}
 						let j = j + 1;
 					}
-					if(((end - start) > shipLength) | ((end - start) = shipLength)){
+
+					if((((end - start) + 1) > shipLength) | (((end - start) + 1) = shipLength)){
 						let k = 0;
 						while(k < shipLength){
 							do toggleShipPart(i, start + k, 4);
@@ -104,7 +105,7 @@ class AIShips{
 						return;
 					}									
 				}
-				if(direction){ // first we try to go left, then right
+				if(direction = 1){ // first we try to go left, then right
 					let end = i;
 					let endLoop = false;
 					while((i > -1) & ~endLoop){ // find left up
@@ -125,6 +126,7 @@ class AIShips{
 					}
 					if((((end - start) + 1) > shipLength) | (((end - start) + 1) = shipLength)){
 						let k = 0;
+						
 						while(k < shipLength){
 							do toggleShipPart(start + k, j, 4);
 							let k = k + 1;
@@ -138,7 +140,7 @@ class AIShips{
 		return;
 	}
 
-	// validates that no adjacent ship present
+	// validates that no adjacent ship presents
 	method Boolean validateCoordinate(Int i, Int j){
 		var Int x, y;
 		var Array tempArray;
@@ -147,7 +149,7 @@ class AIShips{
 		while(x < 2){
 			let y = -1;
 			while(y < 2){
-				if(validateBoundaries(i + (x), j + (y))){
+				if(validateBoundaries(i + x, j + y)){
 					let tempArray = grid[i + (x)];
 					if(tempArray[j + (y)]){
 						return false;

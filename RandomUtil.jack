@@ -1,11 +1,13 @@
 class RandomUtil{ // TODO: upgrade, need more random
 	
 	field Int multiplier, increment, seed;
+	field Boolean dummy;
 
 	constructor RandomUtil new(Int randomSeed){
 		let multiplier = 75;
 		let increment = 74;
 		let seed = randomSeed;
+		let dummy = false;
 		return this;
 	}
 
@@ -20,24 +22,17 @@ class RandomUtil{ // TODO: upgrade, need more random
 			let result = -result;
 		}
 		
-		while((result > 0) ){
-			let result = result - modulus;
-		}
-		if(result < 0){
-			let result = -result;
-		}
+		let result = result - ((result/modulus) * modulus);
 
 		return result;
 	}
 
-	method Boolean nextBoolean(){
-		var Int result;
-		let result = nextInt(100);
-		if(result> 50){
+	method Int nextBoolean(){
+		let dummy = ~dummy;
+		if(dummy){
 			return 1;
-		} else {
-			return 0;
 		}
+		return 0;
 	}
 
 }

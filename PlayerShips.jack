@@ -68,7 +68,7 @@ class PlayerShips{
 			while(j < dimension){
 				if(tempArray[j] = 1){
 					let currShipLength = markShip(i, j);
-					if((currShipLength = 0) | (currShipLength > 5)){
+					if(currShipLength > 5){
 						return false;
 					}
 					if(currShipLength = 5){
@@ -94,7 +94,7 @@ class PlayerShips{
 
 
 		if(five | four | three | two | one){
-			return true; // TODO: change to false
+			return false; // TODO: change to false
 		}
 
 		return true;

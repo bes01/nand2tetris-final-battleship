@@ -1,0 +1,60 @@
+function RandomUtil.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push constant 75
+pop this 0
+push constant 74
+pop this 1
+push argument 0
+pop this 2
+push constant 0
+pop this 3
+push pointer 0
+return
+function RandomUtil.nextInt 1
+push argument 0
+pop pointer 0
+push this 2
+push this 0
+call Math.multiply 2
+push this 1
+add
+pop this 2
+push this 2
+pop local 0
+push local 0
+push constant 0
+lt
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push local 0
+neg
+pop local 0
+label IF_FALSE0
+push local 0
+push local 0
+push argument 1
+call Math.divide 2
+push argument 1
+call Math.multiply 2
+sub
+pop local 0
+push local 0
+return
+function RandomUtil.nextBoolean 0
+push argument 0
+pop pointer 0
+push this 3
+not
+pop this 3
+push this 3
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push constant 1
+return
+label IF_FALSE0
+push constant 0
+return

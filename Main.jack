@@ -2,11 +2,13 @@ class Main {
 
 	function void main() {
 		// var declaration
-		var Canvas canvas;
+		var BattleShipGame game;
 		
 		// var init
-		let canvas = Canvas.new();
+		let game = BattleShipGame.new();
 		
+		do game.run();
+
 		// Dispose 
         return;
     }

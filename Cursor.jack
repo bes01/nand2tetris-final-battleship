@@ -119,7 +119,7 @@ class Cursor{
 	}
 
 	method void Dispose(){
-		// TODO
+		do setCursor(currX, currY, false);
 		return;
 	}
 
