@@ -94,7 +94,7 @@ class PlayerShips{
 
 
 		if(five | four | three | two | one){
-			return true; // TODO: change to false
+			return false; // TODO: change to false
 		}
 
 		return true;

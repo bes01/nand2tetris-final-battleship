@@ -39,27 +39,135 @@ class AIShips{
 	// TODO: implement vertical and horizontal check
 	method void checkIfSank(int i, int j){
 		var Int start, end, direction;
-		var Boolean isSank;
+		var Boolean exit, isSank;
+		var Array tempArray;
 
 		let direction = checkShipDirection(i, j);
-		do Output.printInt(direction);
+
 		// horizontal
 		if(direction = 1){
-
+			// check left
+			let exit = false;
+			let isSank = true;
+			let end = i;
+			while((i > - 1) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let start = i;
+				}
+				let i = i - 1;
+			}
+			if(isSank){
+				let exit = false;
+				let i = end;
+			}
+			// check right
+			while((i < 10) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let end = i;
+				}
+				let i = i + 1;
+			}
+			if(isSank){
+				while(start < (end + 1)){
+					do Sys.wait(200);
+					do toggleShipPart(start, j, 1);
+					let start = start + 1;
+				}
+			}
 		}
 		
 		// vertical
 		if(direction = 2){
-			
+			let exit = false;
+			let isSank = true;
+			let end = j;
+			while((j > - 1) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let start = j;
+				}
+				let j = j - 1;
+			}
+			if(isSank){
+				let exit = false;
+				let j = end;
+			}
+			// check right
+			while((j < 10) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let end = j;
+				}
+				let j = j + 1;
+			}
+			if(isSank){
+				while(start < (end + 1)){
+					do Sys.wait(200);
+					do toggleShipPart(i, start, 1);
+					let start = start + 1;
+				}
+			}
 		}
 
 		// point
 		if(direction = 3){
-			do Sys.wait(500);
+			do Sys.wait(200);
 			do toggleShipPart(i, j, 1);
 		}
 
 		return;
+	}
+
+	method Boolean checkUnsankShipPart(Int i, Int j){
+		var Int x, y;
+		var Array tempArray;
+
+		let x = -1;
+		while(x < 2){
+			let y = -1;
+			while(y < 2){
+				if(validateBoundaries(i + x, j + y)){
+					let tempArray = grid[i + (x)];
+					if(tempArray[j + (y)] = 1){
+						return true;
+					}
+				}
+				let y = y + 1;
+			}
+			let x = x + 1;
+		}
+
+		return false;
 	}
 
 	// 0 - empty cell, 1 - horizontal, 2 - vertical, 3 - point
@@ -128,7 +236,7 @@ class AIShips{
 		}
 
 		if(mode = 1){ // X - sank
-			do toggleShipPart(i, j, 0);  // TODO: remove afterwards
+			do toggleShipPart(i, j, 0);
 			let tempArray[j] = -1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
@@ -171,8 +279,8 @@ class AIShips{
 			let tempArray[j] = 1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
-			do Screen.setColor(true); //TODO: remove coloring
-			do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
+			// do Screen.setColor(true); //TODO: remove coloring
+			// do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
 		}
 
 		return;
