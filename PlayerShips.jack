@@ -2,12 +2,14 @@ class PlayerShips{
 	
 	field Int xStart, yStart, dimension;
 	field Array grid; // i - x, j - y
+	field Int shipsLeft;
 
 	constructor PlayerShips new(Int x, Int y, Int shipDimension){
 		let xStart = x;
 		let yStart = y;
 		let dimension = shipDimension;
 		let grid = Array.new(dimension);
+		let shipsLeft = 7;
 
 		do resetBoard(true);
 
@@ -41,10 +43,268 @@ class PlayerShips{
 		return;
 	}
 
-	method Boolean isShipPart(Int i, Int j){
+	// 0 - missed shot, 1 - ship is partially sank, 2 - fully sank, 3 - already marked, 4 - AI lost the game
+	method Int receiveOpponentShot(int i, int j){
 		var Array tempArray;
+		var Int cellType;
+
 		let tempArray = grid[i];
-		return tempArray[j];
+		let cellType = tempArray[j]; 
+
+		if(cellType = 0){
+			do shootShip(i, j, 1);
+			return 0;
+		}
+		if(cellType = 2){
+			do shootShip(i, j, 2);
+			if(checkIfSank(i, j)){
+				let shipsLeft = shipsLeft - 1;
+				if(shipsLeft = 0){
+					return 4;
+				}
+				return 2;
+			}
+			return 1;
+		}
+
+		return 3;
+	}
+
+	// 1 - missed, 2 - partially sank, 3 - fully sank
+	method void shootShip(int i, int j, int mode){
+		var Array tempArray;
+		var Int tempInt;
+
+		let tempArray = grid[i];
+
+		if(mode = 1){ // # - missed shots
+			let tempArray[j] = 1;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+			let tempInt = ((dimension / 3) + 1);
+
+			// drawing #
+			do Screen.drawLine(i + 1, j + tempInt, i + 18, j + tempInt);
+			do Screen.drawLine(i + 1, j + (2 * tempInt), i + 18, j + (2 * tempInt));
+			do Screen.drawLine(i + tempInt, j + 1, i + tempInt, j + 18);
+			do Screen.drawLine(i + (2 * tempInt), j + 1, i + (2 * tempInt), j + 18);
+		}
+		if(mode = 2){ // ! - partially sank
+			do toggleShipPart(i, j);
+			let tempArray[j] = -1;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+
+			// drawing !
+			do Screen.setColor(true);
+			do Screen.drawRectangle(i + 9, j + 2, i + 10, j + 13);
+			do Screen.drawRectangle(i + 9, j + 15, i + 10, j + 17);
+		}
+		if(mode = 3){ // X - sank
+			do toggleShipPart(i, j);
+			let tempArray[j] = -2;
+			let i = xStart + (i * dimension);
+			let j = yStart + (j * dimension);
+
+			// drawing X
+			do Screen.setColor(true);
+			do Screen.drawLine(i + 2, j + 3, i + dimension - 2, j + dimension - 2);
+			do Screen.drawLine(i + 2, j + 2, i + dimension - 3, j + dimension - 2);
+			do Screen.drawLine(i + 2, j + dimension - 3, i + dimension - 3, j + 2);
+			do Screen.drawLine(i + 2, j + dimension - 2, i + dimension - 2, j + 2);
+			// do Screen.drawRectangle(i + 9, j + 15, i + 10, j + 17);
+		}
+
+		return;
+	}
+
+	method Boolean checkIfSank(int i, int j){
+		var Int start, end, direction;
+		var Boolean exit, isSank;
+		var Array tempArray;
+
+		let direction = checkShipDirection(i, j);
+
+		// horizontal
+		if(direction = 1){
+			// check left
+			let exit = false;
+			let isSank = true;
+			let end = i;
+			while((i > - 1) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let start = i;
+				}
+				let i = i - 1;
+			}
+			if(isSank){
+				let exit = false;
+				let i = end;
+			}
+			// check right
+			while((i < 10) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let end = i;
+				}
+				let i = i + 1;
+			}
+			if(isSank){
+				while(start < (end + 1)){
+					do Sys.wait(200);
+					do shootShip(start, j, 3);
+					let start = start + 1;
+				}
+				return true;
+			}
+		}
+		
+		// vertical
+		if(direction = 2){
+			let exit = false;
+			let isSank = true;
+			let end = j;
+			while((j > - 1) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let start = j;
+				}
+				let j = j - 1;
+			}
+			if(isSank){
+				let exit = false;
+				let j = end;
+			}
+			// check right
+			while((j < 10) & ~exit){
+				let tempArray = grid[i];
+				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+					let exit = true;
+				}
+				if(~exit & checkUnsankShipPart(i, j)){
+					let isSank = false;
+					let exit = true;
+				}
+				if(~exit){
+					let end = j;
+				}
+				let j = j + 1;
+			}
+			if(isSank){
+				while(start < (end + 1)){
+					do Sys.wait(200);
+					do shootShip(i, start, 3);
+					let start = start + 1;
+				}
+				return true;
+			}
+		}
+
+		// point
+		if(direction = 3){
+			do Sys.wait(200);
+			do shootShip(i, j, 3);
+			return true;
+		}
+
+		return false;
+	}
+
+	method Boolean checkUnsankShipPart(Int i, Int j){
+		var Int x, y;
+		var Array tempArray;
+
+		let x = -1;
+		while(x < 2){
+			let y = -1;
+			while(y < 2){
+				if(validateBoundaries(i + x, j + y)){
+					let tempArray = grid[i + (x)];
+					if(tempArray[j + (y)] = 2){
+						return true;
+					}
+				}
+				let y = y + 1;
+			}
+			let x = x + 1;
+		}
+
+		return false;
+	}
+
+	// 0 - empty cell, 1 - horizontal, 2 - vertical, 3 - point
+	method Int checkShipDirection(int i, int j){
+		var Int x, y;
+		var Array tempArray;
+		var boolean isPoint;
+
+		let isPoint = false;
+		let tempArray = grid[i];
+		if(tempArray[j] = -1){
+			let isPoint = true;
+		}
+
+		// check horizontal
+		if(isPoint & validateBoundaries(i + 1, j)){
+			let tempArray = grid[i + 1];
+			if((tempArray[j] = 2) | (tempArray[j] = -1)){
+				return 1;
+			}
+		}
+		if(isPoint & validateBoundaries(i - 1, j)){
+			let tempArray = grid[i - 1];
+			if((tempArray[j] = 2) | (tempArray[j] = -1)){
+				return 1;
+			}
+		}
+
+		// check vertical
+		if(isPoint & validateBoundaries(i, j - 1)){
+			let tempArray = grid[i];
+			if((tempArray[j - 1] = 2) | (tempArray[j - 1] = -1)){
+				return 2;
+			}
+		}
+		if(isPoint & validateBoundaries(i, j + 1)){
+			let tempArray = grid[i];
+			if((tempArray[j + 1] = 2) | (tempArray[j + 1] = -1)){
+				return 2;
+			}
+		}
+		
+		// isPoint
+		if(isPoint){
+			return 3;
+		}
+
+		// it's point
+		return 0;
+	}
+
+	method boolean validateBoundaries(Int i, Int j){
+		return (i > -1) & (i < 10) & (j > -1) & (j < 10); 
 	}
 
 //************************VALIDATION******************************
@@ -77,10 +337,10 @@ class PlayerShips{
 					if(currShipLength = 4){
 						let four = four - 1;
 					}
-					if(currShipLength = three){
+					if(currShipLength = 3){
 						let three = three - 1;
 					}
-					if(currShipLength = two){
+					if(currShipLength = 2){
 						let two = two - 1;
 					}
 					if(currShipLength = 1){
@@ -92,9 +352,8 @@ class PlayerShips{
 			let i = i + 1;
 		}
 
-
 		if(five | four | three | two | one){
-			return false; // TODO: change to false
+			return true; // TODO: change to false
 		}
 
 		return true;
@@ -267,6 +526,15 @@ class PlayerShips{
 		}
 
 		return;
+	}
+
+	method Boolean alreadyShot(int i, int j){
+		var Array tempArray;
+		let tempArray = grid[i];
+		if((tempArray[j] < 0) | (tempArray[j] = 1)){
+			return true;
+		}
+		return false;
 	}
 
 	method void Dispose(){

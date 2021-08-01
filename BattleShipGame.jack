@@ -107,7 +107,7 @@ class BattleShipGame{
 		}
 
 		// AI board init
-		let aiGrid = AIShips.new(RandomUtil.new(seed), xStartAI, yStart, dimension);
+		let aiGrid = AIShips.new(RandomUtil.new(seed), xStartAI, yStart, dimension, playerGrid);
 
      	return;
 	}
@@ -115,6 +115,7 @@ class BattleShipGame{
 	method void run(){
 		var char key;  
 		var boolean exit;
+		var Int shotResult;
 		let cursor = Cursor.new(xStartAI, yStart, dimension, xStartAI, xEndAI, yStart, yEnd);
 
 		let exit = false;
@@ -130,7 +131,19 @@ class BattleShipGame{
 			if (key = 133) { do cursor.moveDown(); }   // down arrow
 			if (key = 130) { do cursor.moveLeft(); }   // left arrow
 			if (key = 132) { do cursor.moveRight(); }   // right arrow
-			if (key = 128) { do aiGrid.receiveOpponentShot(cursor.getX(), cursor.getY()); }  // enter, p.s: სლაიდებში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
+			if (key = 128) { // enter, p.s: სლაიდებში ეწერა 61 მაგრამ ჩემთან 128 იყო :/
+				let shotResult = aiGrid.receiveOpponentShot(cursor.getX(), cursor.getY());
+				if(shotResult = 0){
+					if(aiGrid.playTurn()){
+						do Output.printString("Computer  Won");	
+						let exit = true;
+					}
+				}
+				if(shotResult = 4){
+					do Output.printString("Player Won");
+					let exit = true;
+				}
+			}  
 
 			// waits for the key to be released
 			while (~(key = 0)) {

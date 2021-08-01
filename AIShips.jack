@@ -3,21 +3,27 @@ class AIShips{
 	field RandomUtil random;
 	field Int xStart, yStart, dimension;
 	field Array grid; // i - x, j - y
+	field Int shipsLeft;
+	field PlayerShips opponent;
+	field Int xShot, yShot, xShotOrigin, yShotOrigin, shotDirection; // -1 - ship part not found, 0 - horizontal, 1 - vertical, 3 - unknown
 
-
-	constructor AIShips new(RandomUtil randomInstance, Int x, Int y, Int shipDimension){
+	constructor AIShips new(RandomUtil randomInstance, Int x, Int y, Int shipDimension, PlayerShips player){
 		let random = randomInstance;
 		let xStart = x;
 		let yStart = y;
 		let dimension = shipDimension;
 		let grid = Array.new(dimension);
+		let shipsLeft = 7;
+		let opponent = player;
+		let shotDirection = -1;
 
 		do resetBoard(true);
 
 		return this;
 	}
 
-	method void receiveOpponentShot(int i, int j){
+	// 0 - missed shot, 1 - ship is partially sank, 2 - fully sank, 3 - already marked, 4 - AI lost the game
+	method Int receiveOpponentShot(int i, int j){
 		var Array tempArray;
 		var Int cellType;
 
@@ -26,18 +32,24 @@ class AIShips{
 
 		if(cellType = 0){
 			do toggleShipPart(i, j, 3);
+			return 0;
 		}
 		if(cellType = 1){
 			do toggleShipPart(i, j, 2);
+			if(checkIfSank(i, j)){
+				let shipsLeft = shipsLeft - 1;
+				if(shipsLeft = 0){
+					return 4;
+				}
+				return 2;
+			}
+			return 1;
 		}
-		
-		do checkIfSank(i, j);
-		
-		return;
+
+		return 3;
 	}
 
-	// TODO: implement vertical and horizontal check
-	method void checkIfSank(int i, int j){
+	method Boolean checkIfSank(int i, int j){
 		var Int start, end, direction;
 		var Boolean exit, isSank;
 		var Array tempArray;
@@ -89,6 +101,7 @@ class AIShips{
 					do toggleShipPart(start, j, 1);
 					let start = start + 1;
 				}
+				return true;
 			}
 		}
 		
@@ -136,6 +149,7 @@ class AIShips{
 					do toggleShipPart(i, start, 1);
 					let start = start + 1;
 				}
+				return true;
 			}
 		}
 
@@ -143,9 +157,10 @@ class AIShips{
 		if(direction = 3){
 			do Sys.wait(200);
 			do toggleShipPart(i, j, 1);
+			return true;
 		}
 
-		return;
+		return false;
 	}
 
 	method Boolean checkUnsankShipPart(Int i, Int j){
@@ -221,7 +236,6 @@ class AIShips{
 
 	// modes: 0 - clear, 1 - X, 2 - !, 3 - #, 4 - mark matrix
 	method void toggleShipPart(Int i, Int j, Int mode){
-		var Boolean black;
 		var Array tempArray;
 		var Int tempInt;
 
@@ -241,7 +255,7 @@ class AIShips{
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
 
-			// drawing !
+			// drawing X
 			do Screen.setColor(true);
 			do Screen.drawLine(i + 2, j + 3, i + dimension - 2, j + dimension - 2);
 			do Screen.drawLine(i + 2, j + 2, i + dimension - 3, j + dimension - 2);
@@ -251,7 +265,6 @@ class AIShips{
 		}
 
 		if(mode = 2){ // ! - partially sank
-			do toggleShipPart(i, j, 0);  // TODO: remove afterwards
 			let tempArray[j] = 2;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
@@ -279,8 +292,6 @@ class AIShips{
 			let tempArray[j] = 1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
-			// do Screen.setColor(true); //TODO: remove coloring
-			// do Screen.drawRectangle(i + 2, j + 2, i + dimension - 2, j + dimension - 2);
 		}
 
 		return;
@@ -430,6 +441,111 @@ class AIShips{
 		do placeShipSomewhere(2);
 		do placeShipSomewhere(1);
 		do placeShipSomewhere(1);
+
+		return;
+	}
+
+	// true - computer won the game
+	method boolean playTurn(){
+		var Boolean exit, directionChanged;
+		var Int i, j, shotResult;
+		let exit = false;
+
+		while(~exit){
+			let i = random.nextInt(10);
+			let j = random.nextInt(10);
+
+			if(shotDirection > -1){
+				do guessShipPart();
+				let i = xShot;
+				let j = yShot;
+			}		
+
+			if(~opponent.alreadyShot(i, j)){
+				do Sys.wait(200);
+				let shotResult = opponent.receiveOpponentShot(i, j);
+				let directionChanged = false;
+				if(shotResult = 0){
+					let exit = true;
+				}
+				if (shotResult = 1){ // imitate clever moves
+					if(shotDirection = -1){ // first successful shot
+						let xShotOrigin = i;
+						let yShotOrigin = j;
+						let shotDirection = 3;
+						let directionChanged = true;
+					}
+					if((shotDirection = 3) & ~directionChanged){ // second shot gives us direction
+						let shotDirection = 1; // horizontal
+						if(xShot = xShotOrigin){ // guessed shot wasn't horizontal
+							let shotDirection = 2; // vertical
+						}
+					}
+				}
+				if (shotResult = 2){ // ship fully sank
+					let shotDirection = -1;
+				}
+				if (shotResult = 4){ // last ship fully sank and computer won the game
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	method void guessShipPart(){
+		var Boolean randomDirection, alreadyTried; // false - horizontal, true - vertical
+
+		let alreadyTried = false;
+
+		if(shotDirection = 3){
+			let randomDirection = random.nextBoolean();
+			let xShot = xShotOrigin;
+			let yShot = yShotOrigin;
+			if(randomDirection){ // vertical
+				if((yShot > 0) & ~opponent.alreadyShot(xShot, yShot - 1)){ // try up
+					let yShot = yShot - 1;
+					return; 
+				}				
+				if((yShot < 9) & ~opponent.alreadyShot(xShot, yShot + 1)){ // try up
+					let yShot = yShot + 1;
+					return; 
+				}		
+				let alreadyTried = true;	
+			}
+			if((~randomDirection) | alreadyTried){ // horizontal
+				if((xShot > 0) & ~opponent.alreadyShot(xShot - 1, yShot)){ // try up
+					let xShot = xShot - 1;
+					return; 
+				}				
+				if((xShot < 9) & ~opponent.alreadyShot(xShot + 1, yShot)){ // try up
+					let xShot = xShot + 1;
+					return; 
+				}	
+			}
+			 // try vertical in case randomDirection was horizontal and didnt succeed
+			if((yShot > 0) & ~opponent.alreadyShot(xShot, yShot - 1)){ // try up
+				let yShot = yShot - 1;
+				return; 
+			}				
+			if((yShot < 9) & ~opponent.alreadyShot(xShot, yShot + 1)){ // try up
+				let yShot = yShot + 1;
+				return; 
+			}		
+		}
+
+		// Vertical
+		if(shotDirection = 2){
+			// TODO: traverse vertically
+			return;
+		}
+
+		// Horizontal
+		if(shotDirection = 1){
+			// TODO: traverse horizontally
+			return;
+		}
 
 		return;
 	}
