@@ -133,7 +133,7 @@ class PlayerShips{
 			let end = i;
 			while((i > - 1) & ~exit){
 				let tempArray = grid[i];
-				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+				if((tempArray[j] = 0) | (tempArray[j] = 1)){
 					let exit = true;
 				}
 				if(~exit & checkUnsankShipPart(i, j)){
@@ -152,7 +152,7 @@ class PlayerShips{
 			// check right
 			while((i < 10) & ~exit){
 				let tempArray = grid[i];
-				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+				if((tempArray[j] = 0) | (tempArray[j] = 1)){
 					let exit = true;
 				}
 				if(~exit & checkUnsankShipPart(i, j)){
@@ -181,7 +181,7 @@ class PlayerShips{
 			let end = j;
 			while((j > - 1) & ~exit){
 				let tempArray = grid[i];
-				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+				if((tempArray[j] = 0) | (tempArray[j] = 1)){
 					let exit = true;
 				}
 				if(~exit & checkUnsankShipPart(i, j)){
@@ -200,7 +200,7 @@ class PlayerShips{
 			// check right
 			while((j < 10) & ~exit){
 				let tempArray = grid[i];
-				if((tempArray[j] = 0) | (tempArray[j] = 3)){
+				if((tempArray[j] = 0) | (tempArray[j] = 1)){
 					let exit = true;
 				}
 				if(~exit & checkUnsankShipPart(i, j)){
@@ -353,7 +353,7 @@ class PlayerShips{
 		}
 
 		if(five | four | three | two | one){
-			return true; // TODO: change to false
+			return false; // TODO: change to false
 		}
 
 		return true;
@@ -535,6 +535,18 @@ class PlayerShips{
 			return true;
 		}
 		return false;
+	}
+
+	method Boolean isMissedShot(int i, int j){
+		var Array tempArray;
+		let tempArray = grid[i];
+		return tempArray[j] = 1;
+	}
+
+	method Boolean notShotYet(int i, int j){
+		var Array tempArray;
+		let tempArray = grid[i];
+		return (tempArray[j] = 2) | (tempArray[j] = 0);
 	}
 
 	method void Dispose(){

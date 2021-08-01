@@ -462,14 +462,14 @@ class AIShips{
 			}		
 
 			if(~opponent.alreadyShot(i, j)){
-				do Sys.wait(200);
+				do Sys.wait(500);
 				let shotResult = opponent.receiveOpponentShot(i, j);
 				let directionChanged = false;
 				if(shotResult = 0){
 					let exit = true;
 				}
 				if (shotResult = 1){ // imitate clever moves
-					if(shotDirection = -1){ // first successful shot
+					if(shotDirection = -1){ // first successful shot						
 						let xShotOrigin = i;
 						let yShotOrigin = j;
 						let shotDirection = 3;
@@ -495,7 +495,9 @@ class AIShips{
 	}
 
 	method void guessShipPart(){
-		var Boolean randomDirection, alreadyTried; // false - horizontal, true - vertical
+		var Int temp;
+		var Array tempArray;
+		var Boolean randomDirection, alreadyTried, exit; // false - horizontal, true - vertical
 
 		let alreadyTried = false;
 
@@ -537,14 +539,66 @@ class AIShips{
 
 		// Vertical
 		if(shotDirection = 2){
-			// TODO: traverse vertically
-			return;
+			let exit = false;
+			let temp = yShotOrigin;
+			while((temp > -1) & ~exit){
+				if(opponent.isMissedShot(xShotOrigin, temp)){ // if we reach #
+					let exit = true;
+				}
+				if(opponent.notShotYet(xShotOrigin, temp)){
+					let xShot = xShotOrigin;
+					let yShot = temp;
+					return;
+				}
+				let temp = temp - 1;
+			}
+			let temp = yShotOrigin;
+			let exit = false;
+			while((temp < 10) & ~exit){
+				if(opponent.isMissedShot(xShotOrigin, temp)){ // if we reach #
+					let exit = true;
+				}
+				if(opponent.notShotYet(xShotOrigin, temp)){
+					let xShot = xShotOrigin;
+					let yShot = temp;
+					return;
+				}
+				let temp = temp + 1;
+			}
 		}
 
 		// Horizontal
 		if(shotDirection = 1){
-			// TODO: traverse horizontally
-			return;
+			let exit = false;
+			let temp = xShotOrigin;
+			while((temp > -1) & ~exit){
+				if(opponent.isMissedShot(temp, yShotOrigin)){ // if we reach #
+					do Output.printInt(temp);
+					do Output.printString("-");
+					do Output.printInt(yShotOrigin);
+					do Output.printString(" ");
+					let exit = true;
+				}
+				if(opponent.notShotYet(temp, yShotOrigin)){
+					let xShot = temp;
+					let yShot = yShotOrigin;
+					return;
+				}
+				let temp = temp - 1;
+			}
+			let temp = xShotOrigin;
+			let exit = false;
+			while((temp < 10) & ~exit){
+				if(opponent.isMissedShot(temp, yShotOrigin)){ // if we reach #
+					let exit = true;
+				}
+				if(opponent.notShotYet(temp, yShotOrigin)){
+					let xShot = temp;
+					let yShot = yShotOrigin;
+					return;
+				}
+				let temp = temp + 1;
+			}
 		}
 
 		return;
