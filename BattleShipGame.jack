@@ -12,6 +12,8 @@ class BattleShipGame{
 	field PlayerShips playerGrid;
 	field AIShips aiGrid;
 
+	field String computerWonMessage, playerWonMessage;
+
 
 	constructor BattleShipGame new(){
 		// class variable init
@@ -22,17 +24,25 @@ class BattleShipGame{
 		let yStart = 28;
 		let yEnd = 228;
 		let dimension = 20;
+		let computerWonMessage = "Computer  Won! Press Space for Rematch :)";
+		let playerWonMessage = "Player Won! Press Space for Rematch :)";
 
 		// draw boards
+		do Screen.setColor(true);
 		do drawCells(xStartPlayer, xEndPlayer);
 		do drawCells(xStartAI, xEndAI);
+		do Output.printString("");  //რატომღაც ამის გარეშე ერორს აგდებს
 
 		// init cursor
 		let cursor = Cursor.new(xStartPlayer, yStart, dimension, xStartPlayer, xEndPlayer, yStart, yEnd);
+		do Output.printString("");  //რატომღაც ამის გარეშე ერორს აგდებს
 
 		// init boards
 		let playerGrid = PlayerShips.new(xStartPlayer, yStart, dimension);
+		do Output.printString("");  //რატომღაც ამის გარეშე ერორს აგდებს
+
 		do initBoards();
+		do Output.printString("");  //რატომღაც ამის გარეშე ერორს აგდებს
 
 		return this;
 	}
@@ -84,7 +94,7 @@ class BattleShipGame{
 				let key = Keyboard.keyPressed();
 				let seed = seed + 1;
 			}
-
+			
 			if (key = 131) { do cursor.moveUp(); }   // up arrow
 			if (key = 133) { do cursor.moveDown(); }   // down arrow
 			if (key = 130) { do cursor.moveLeft(); }   // left arrow
@@ -93,7 +103,7 @@ class BattleShipGame{
 			if (key = 83) { // s key
 				if (playerGrid.validateBoard()){
 					let exit = true;
-					do cursor.Dispose();
+					do cursor.dispose();
 				}
 				if (~exit){
 					do playerGrid.resetBoard(false);
@@ -117,7 +127,6 @@ class BattleShipGame{
 		var boolean exit;
 		var Int shotResult;
 		let cursor = Cursor.new(xStartAI, yStart, dimension, xStartAI, xEndAI, yStart, yEnd);
-
 		let exit = false;
 
 		// Player board init
@@ -135,12 +144,14 @@ class BattleShipGame{
 				let shotResult = aiGrid.receiveOpponentShot(cursor.getX(), cursor.getY());
 				if(shotResult = 0){
 					if(aiGrid.playTurn()){
-						do Output.printString("Computer  Won");	
+						do Output.moveCursor(0, 0);
+						do Output.printString(computerWonMessage);	
 						let exit = true;
 					}
 				}
 				if(shotResult = 4){
-					do Output.printString("Player Won");
+					do Output.moveCursor(0, 0);
+					do Output.printString(playerWonMessage);
 					let exit = true;
 				}
 			}  
@@ -151,6 +162,45 @@ class BattleShipGame{
 			}
 		}
 
+		return;
+	}
+
+	method void waitForRestart(){
+		var char key;  
+		var boolean exit;
+
+		let exit = false;
+
+		// Player board init
+		while (~exit) {
+			// waits for a key to be pressed
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+			}
+
+			if(key = 32){ // Space
+				let exit = true;
+			}
+
+			// waits for the key to be released
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+			}
+		}
+
+		do Dispose();
+
+		return;
+	}
+
+	method void Dispose(){
+		do Screen.clearScreen();
+		do cursor.dispose();
+		do aiGrid.dispose();
+		do playerGrid.dispose();
+		do computerWonMessage.dispose();
+		do playerWonMessage.dispose();
+		do Memory.deAlloc(this);
 		return;
 	}
 

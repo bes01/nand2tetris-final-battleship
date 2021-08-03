@@ -289,6 +289,7 @@ class AIShips{
 		}
 
 		if(mode = 4){ // mark matrix / put ship
+			// do toggleShipPart(i,j, 3); // uncomment to see ai ships, not recommended
 			let tempArray[j] = 1;
 			let i = xStart + (i * dimension);
 			let j = yStart + (j * dimension);
@@ -573,10 +574,6 @@ class AIShips{
 			let temp = xShotOrigin;
 			while((temp > -1) & ~exit){
 				if(opponent.isMissedShot(temp, yShotOrigin)){ // if we reach #
-					do Output.printInt(temp);
-					do Output.printString("-");
-					do Output.printInt(yShotOrigin);
-					do Output.printString(" ");
 					let exit = true;
 				}
 				if(opponent.notShotYet(temp, yShotOrigin)){
@@ -601,6 +598,14 @@ class AIShips{
 			}
 		}
 
+		return;
+	}
+
+	method void dispose(){
+		do random.dispose();
+		do grid.dispose();
+		do opponent.dispose();
+		do Memory.deAlloc(this);
 		return;
 	}
 

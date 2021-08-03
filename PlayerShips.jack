@@ -549,8 +549,9 @@ class PlayerShips{
 		return (tempArray[j] = 2) | (tempArray[j] = 0);
 	}
 
-	method void Dispose(){
-		// TODO
+	method void dispose(){
+		do grid.dispose();
+		do Memory.deAlloc(this);
 		return;
 	}
 

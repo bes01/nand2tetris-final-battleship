@@ -1,13 +1,18 @@
 class Main {
-
+	// ცუდი რენდომის გამო კომპიუტერი ყველა უჯრას ვერ ფარავს რო ესროლოს.
+	// ამიტომ წაგება/მოგების სიმულაციისთვის შესაძლებელია AiShips და/ან PlayerShips კლასებში shipsLeft ცვლადის შემცირება, რათა ნაკლები გემების ჩაძირვით დამთავრდეს თამაში
 	function void main() {
 		// var declaration
 		var BattleShipGame game;
 		
 		// var init
-		let game = BattleShipGame.new();
-		
-		do game.run();
+		while(true){
+			let game = BattleShipGame.new();
+
+			do game.run();
+
+			do game.waitForRestart();
+		}
 
 		// Dispose 
         return;

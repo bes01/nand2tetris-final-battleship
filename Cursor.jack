@@ -118,8 +118,9 @@ class Cursor{
 		return j;
 	}
 
-	method void Dispose(){
+	method void dispose(){
 		do setCursor(currX, currY, false);
+		do Memory.deAlloc(this);
 		return;
 	}
 

@@ -1,4 +1,4 @@
-class RandomUtil{ // TODO: upgrade, need more random
+class RandomUtil{ // დიდად კაი რენდომი ვერაა, ამიტომ კომპიუტერი უმეტესად წააგებს, გაამეორებს სვლებს რის გამოც ჩაიციკლება ბოლოს, ვერ ფარავს ყველა უჯრებს ეს რენდომი :(
 	
 	field Int multiplier, increment, seed;
 	field Boolean dummy;
@@ -33,6 +33,11 @@ class RandomUtil{ // TODO: upgrade, need more random
 			return 1;
 		}
 		return 0;
+	}
+
+	method void dispose(){
+		do Memory.deAlloc(this);
+		return;
 	}
 
 }
